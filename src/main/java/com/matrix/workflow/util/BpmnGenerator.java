@@ -1,52 +1,35 @@
 package com.matrix.workflow.util;
 
-import com.matrix.workflow.behavior.HelloBehavior;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.EndEvent;
-import org.activiti.bpmn.model.Process;
-import org.activiti.bpmn.model.SequenceFlow;
-import org.activiti.bpmn.model.ServiceTask;
-import org.activiti.bpmn.model.StartEvent;
+import com.matrix.workflow.listener.SayTaskListener;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 public class BpmnGenerator {
 
-  public static BpmnModel generateModel() {
-    // 创建BPMN流程模型
-    BpmnModel model = new BpmnModel();
-    Process process = new Process();
-    process.setId("my-process");
-    model.addProcess(process);
+  public static BpmnModelInstance generateModel(String id, String name) {
+    BpmnModelInstance modelInstance =
+        Bpmn.createExecutableProcess()
+            .id(id)
+            .name(name)
+            // start event
+            .startEvent("start")
+            // user task: say, delegate execute after task complete
+            .userTask("say")
+            .camundaTaskListenerDelegateExpression(
+                SayTaskListener.EVENTNAME_COMPLETE, "${sayTaskListener}")
+            // gateway, say count < 10 -> service task: hello, say count >= 10 -> end
+            .exclusiveGateway("gateway")
+            .name("gateway")
+            .condition("yes", "#{count < 10}")
+            // say hello service task with delegate
+            .serviceTask("hello")
+            .camundaDelegateExpression("${helloDelegate}")
+            .connectTo("say")
+            .moveToNode("gateway")
+            .condition("no", "#{count >= 10}")
+            .endEvent()
+            .done();
 
-    StartEvent start = new StartEvent();
-    start.setId("start");
-    process.addFlowElement(start);
-
-    // 添加用户任务节点
-    ServiceTask task = new ServiceTask();
-    task.setId("hello");
-    task.setName("User Task");
-    task.setImplementation(HelloBehavior.class.getCanonicalName());
-    task.setResultVariableName("result");
-    process.addFlowElement(task);
-
-    // 添加结束事件节点
-    EndEvent endEvent = new EndEvent();
-    endEvent.setId("end-event");
-    process.addFlowElement(endEvent);
-
-    // 添加流程顺序流和任务分配关系
-    SequenceFlow flow1 = new SequenceFlow();
-    flow1.setId("flow1");
-    flow1.setSourceRef("start");
-    flow1.setTargetRef("hello");
-    process.addFlowElement(flow1);
-
-    SequenceFlow flow2 = new SequenceFlow();
-    flow2.setId("flow2");
-    flow2.setSourceRef("hello");
-    flow2.setTargetRef("end");
-    process.addFlowElement(flow2);
-
-    return model;
+    return modelInstance;
   }
 }
