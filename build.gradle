@@ -27,7 +27,7 @@ dependencies {
     implementation 'org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-rest:7.18.0'
     implementation 'org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-webapp:7.18.0'
     compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'com.mysql:mysql-connector-j:8.3.0'
+    runtimeOnly 'com.h2database:h2:1.4.200'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

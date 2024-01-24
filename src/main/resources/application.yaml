@@ -1,9 +1,3 @@
-spring:
-  datasource:
-    url: jdbc:mysql://rm-2ev56834f7v58862g.mysql.rds.aliyuncs.com/camunda
-    username: camunda
-    password: 8_+C3vD@Z5ykJ#7B
-    driver-class-name: com.mysql.cj.jdbc.Driver
 camunda.bpm:
   admin-user:
     id: admin
@@ -11,7 +5,4 @@ camunda.bpm:
     firstName: admin
   filter:
     create: All tasks
-  database:
-    type: mysql
-    schema-update: true
   auto-deployment-enabled: false
